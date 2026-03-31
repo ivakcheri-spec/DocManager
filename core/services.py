@@ -14,6 +14,7 @@ from datetime import datetime
 from core.file_manager import file_manager
 from core.thumbnail import thumbnail_generator
 from core.reader import PDF_reader
+from core.model import Document
 PDF_STORAGE = os.path.join("storage","pdf")
 
 
@@ -26,7 +27,6 @@ class DocumentService:
 		self.PDF_reader = PDF_reader()
 
 	def uploadDocument(self,uploaded_file,tags,Description,lecture_date = None):
-		doc = []
 	  #1.save the file
 	 
 		file_path = self.file_manager.save_file(uploaded_file)
@@ -41,12 +41,17 @@ class DocumentService:
 	  #5. create uploaded date
 		upload_date = datetime.now().strftime("%Y-%m-%d")
 	  # 6. #Sve to DB
-		doc.append(uploaded_file.name)
-		doc.append(file_path)
-		doc.append(thumnail_path)
-		doc.append(tags)
-		doc.append(Description)
-		doc.append(upload_date)
-		doc.append(lecture_date)
-		doc.append(total_pages)
-		self.repo.add_document(doc) 
+		doc = Document(
+            id=None,
+            name=uploaded_file.name,
+            path=file_path,
+            thumbnail_path=thumnail_path,
+            tags=tags,
+            description=Description,
+            upload_date=datetime.now().strftime("%Y-%m-%d"),
+            lecture_date=lecture_date,
+            total_pages=total_pages
+        )
+	
+	def search_Document(self,tags = None, date = None):
+		return self.repo.search_Document(tags , date)
